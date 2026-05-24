@@ -43,9 +43,20 @@ jobs:
       - Build
     runs-on: ubuntu-latest
     steps:
+    
       - name: Git Clone
         uses: actions/checkout@v4
-        
+
+      - name: Download Maven artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: maven-build
+          path: target/
+
+      - name: Prepare JAR for Dockerfile
+        run: |
+          cp target/*.jar spring-petclinic-2.6.0.jar
+          
       - name: Docker Login
         uses: docker/login-action@v4.1.0
         with:
