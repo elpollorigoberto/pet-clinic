@@ -59,9 +59,9 @@ jobs:
         with:
           project: 'pet-clinic'
           path: '.'
-          format: 'HTML'
+          format: 'ALL'
           args: >
-            --disableCentral
+            --failOnCVSS 4
           
       - name: Upload Dependency Check SARIF
         if: always()
@@ -79,7 +79,7 @@ jobs:
   Docker-build:
     name: Build Docker Image
     needs: 
-      - Build
+      - SCA
     runs-on: ubuntu-latest
     steps:
     
@@ -133,8 +133,3 @@ jobs:
       - name: Docker Push
         run: | 
           docker push elpollorigoberto/pet-clinic:latest
-          
-      - name: Docker Push
-        run: | 
-          docker push elpollorigoberto/pet-clinic:latest
-
