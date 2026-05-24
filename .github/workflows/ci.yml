@@ -67,13 +67,6 @@ jobs:
         run: | 
           docker build --tag elpollorigoberto/pet-clinic:latest .
 
-  Docker-push:
-    name: Push Docker Image to Registry
-    needs: 
-      - Docker-build
-    runs-on: ubuntu-latest
-    
-    steps:
       - name: Docker Push
         run: | 
           docker push elpollorigoberto/pet-clinic:latest
