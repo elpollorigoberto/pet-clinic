@@ -67,6 +67,31 @@ jobs:
         run: | 
           docker build --tag elpollorigoberto/pet-clinic:latest .
 
+      - name: Docker Build
+        run: | 
+          docker build --tag elpollorigoberto/pet-clinic:latest .
+
+      - name: Image Security
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: 'elpollorigoberto/pet-clinic:latest'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'MEDIUM,HIGH,CRITICAL'
+          exit-code: '1'
+
+      - name: Upload Trivy SARIF report
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Docker Push
+        run: | 
+          docker push elpollorigoberto/pet-clinic:latest
+          
       - name: Docker Push
         run: | 
           docker push elpollorigoberto/pet-clinic:latest
