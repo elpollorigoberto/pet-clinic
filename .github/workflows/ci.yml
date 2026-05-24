@@ -24,18 +24,18 @@ jobs:
       - name: Set Up JDK
         uses: actions/setup-java@v4.2.1
         with:
-          java-version: '17'
+          java-version: '11'
           distribution: 'temurin'
           
       - name: Mvn compile
         run: |
           mvn -q -DskipTests package
       
-      - name: Upload Maven artifacts
+      - name: Upload Maven artifact
         uses: actions/upload-artifact@v4
         with:
           name: maven-build
-          path: target/
+          path: target/*.jar
                     
   Docker-build:
     name: Build Docker Image
