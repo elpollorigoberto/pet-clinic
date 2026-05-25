@@ -54,6 +54,24 @@ jobs:
           cat sonar-vulnerabilities.json
           jq '.total' sonar-vulnerabilities.json
 
+      - name: Show SonarCloud vulnerability summary
+        if: always()
+        run: |
+          echo "## SonarCloud SAST Vulnerability Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          total=$(jq '.total // 0' sonar-vulnerabilities.json)
+          echo "**Total vulnerabilities MAJOR/CRITICAL/BLOCKER:** $total" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "| Severity | Rule | File | Line | Message |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|---:|---|" >> $GITHUB_STEP_SUMMARY
+
+          jq -r '
+            (.issues // [])[]
+            | "| \(.severity) | \(.rule) | \(.component) | \(.line // "N/A") | \(.message | gsub("\\|"; "\\|")) |"
+          ' sonar-vulnerabilities.json >> $GITHUB_STEP_SUMMARY
+      
       - name: Upload SonarCloud SAST Report
         if: always()
         uses: actions/upload-artifact@v4
