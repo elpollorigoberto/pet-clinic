@@ -23,12 +23,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set Up JDK
+      - name: Set Up JDK for SonarCloud
         uses: actions/setup-java@v4.2.1
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
-
+      
       - name: SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
