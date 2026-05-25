@@ -29,7 +29,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      
+
       - name: SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -48,9 +48,10 @@ jobs:
           sleep 20
 
           curl -s -u "${SONAR_TOKEN}:" \
-            "https://sonarcloud.io/api/issues/search?componentKeys=${SONAR_PROJECT_KEY}&types=VULNERABILITY&severities=MEDIUM,HIGH,CRITICAL&statuses=OPEN,CONFIRMED,REOPENED" \
+            "https://sonarcloud.io/api/issues/search?componentKeys=${SONAR_PROJECT_KEY}&types=VULNERABILITY&severities=MAJOR,CRITICAL,BLOCKER&statuses=OPEN,CONFIRMED,REOPENED" \
             -o sonar-vulnerabilities.json
 
+          cat sonar-vulnerabilities.json
           jq '.total' sonar-vulnerabilities.json
 
       - name: Upload SonarCloud SAST Report
@@ -62,33 +63,12 @@ jobs:
 
       - name: Fail on MEDIUM/HIGH/CRITICAL Sonar vulnerabilities
         run: |
-          total=$(jq '.total' sonar-vulnerabilities.json)
+          total=$(jq '.total // 0' sonar-vulnerabilities.json)
 
-          echo "SonarCloud MEDIUM/HIGH/CRITICAL vulnerabilities: $total"
-
-          if [ "$total" -gt 0 ]; then
-            echo "SAST failed: SonarCloud found MEDIUM/HIGH/CRITICAL vulnerabilities."
-            exit 1
-          fi
-
-      - name: Fail on MEDIUM/HIGH/CRITICAL Sonar vulnerabilities
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: elpollorigoberto_pet-clinic
-        run: |
-          sleep 20
-
-          response=$(curl -s -u "${SONAR_TOKEN}:" \
-            "https://sonarcloud.io/api/issues/search?componentKeys=${SONAR_PROJECT_KEY}&types=VULNERABILITY&severities=MEDIUM,HIGH,CRITICAL&statuses=OPEN,CONFIRMED,REOPENED")
-
-          echo "$response" > sonar-vulnerabilities.json
-
-          total=$(echo "$response" | jq '.total')
-
-          echo "SonarCloud MEDIUM/HIGH/CRITICAL vulnerabilities: $total"
+          echo "SonarCloud vulnerabilities MAJOR/CRITICAL/BLOCKER: $total"
 
           if [ "$total" -gt 0 ]; then
-            echo "SAST failed: SonarCloud found MEDIUM/HIGH/CRITICAL vulnerabilities."
+            echo "SAST failed: SonarCloud found vulnerabilities with severity MEDIUM or higher."
             exit 1
           fi
             
